@@ -58,7 +58,7 @@ div[data-testid="stMetric"] {
 /* 1. เปลี่ยนพื้นหลังหลักของแอปเป็นสีดำ/เทาเข้ม */
 .stApp {
     background-color: #0E1117;
-    color: #FAFAFA;
+    color: #050404;
 }
 
 /* 2. ปรับแต่งแถบ Sidebar ให้เป็นธีมดำเข้ม */
