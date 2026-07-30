@@ -134,8 +134,7 @@ def render_model_page(title, icon, description, color):
     
     # ปุ่มย้อนกลับไปหน้าหลัก
     st.markdown('<div class="btn-secondary">', unsafe_allow_html=True)
-    if st.button("⬅️ กลับหน้าหลัก"):
-        change_page("🏠 หน้าหลัก (Home)")
+    if st.button(..., on_click=change_page, args=("🏠 หน้าหลัก (Home)",))
     st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
