@@ -109,7 +109,7 @@ def render_model_page(title, icon, description, color):
     st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
-    st.markdown("### ⚙️ พื้นที่สำหรับใส่โค้ดโมเดล")
+    st.markdown("### ทดลองใช้งานโมเดล")
 
 # ==========================================
 # การแสดงผลเนื้อหาหลัก (Main Content Routing)
