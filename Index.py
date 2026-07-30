@@ -383,15 +383,20 @@ elif selected_page == "📈 Regression":
     render_model_page("Regression", "📈", "Regression prediction model for continuous data.", "#EF4444")
 
 elif selected_page == "🌲 Ensemble (Random Forest)":
-    render_model_page("Ensemble (Random Forest)", "🌲", "Ensemble classification using Random Forest.", "#06B6D4")
+    render_model_page("Ensemble (Random Forest)", "🌲", "AI ทำนายทิศทางหุ้นแบบ Real-time ด้วย Random Forest", "#06B6D4")
+    
     st.markdown("### 📊 1. ระบุหุ้นที่ต้องการวิเคราะห์")
     
-    # ให้ผู้ใช้กรอกชื่อหุ้น
+    # ⚠️ บรรทัดนี้แหละครับที่น่าจะหายไป!
     ticker_input = st.text_input("กรอกสัญลักษณ์หุ้น (เช่น AAPL, TSLA หรือ PTT.BK สำหรับหุ้นไทย)", value="AAPL")
     
     st.markdown("---")
     
-if st.button("🚀 ดึงข้อมูลล่าสุด & วิเคราะห์แนวโน้ม", use_container_width=True):
+    if st.button("🚀 ดึงข้อมูลล่าสุด & วิเคราะห์แนวโน้ม", use_container_width=True):
+        import pickle
+        import yfinance as yf
+        import pandas as pd
+        
         try:
             with st.spinner(f'กำลังดึงข้อมูลหุ้น {ticker_input} จากตลาดหลักทรัพย์...'):
                 # 1. โหลดสมอง AI
@@ -409,10 +414,10 @@ if st.button("🚀 ดึงข้อมูลล่าสุด & วิเค�
                     ticker_data['SMA_30'] = ticker_data['Close'].rolling(window=30).mean()
                     ticker_data['Volume_Change'] = ticker_data['Volume'].pct_change()
                     
-                    # 4. ดึงข้อมูลวันล่าสุด (ปรับแก้เพื่อรองรับ yfinance เวอร์ชั่นใหม่)
+                    # 4. ดึงข้อมูลวันล่าสุด (รองรับ yfinance เวอร์ชั่นใหม่)
                     latest_data = ticker_data.iloc[-1]
                     
-                    # ฟังก์ชันช่วยดึงค่าตัวเลขออกมาให้ปลอดภัย 100%
+                    # ฟังก์ชันช่วยดึงค่าตัวเลขออกมาให้ปลอดภัย
                     def get_safe_float(column_name):
                         val = latest_data[column_name]
                         if isinstance(val, pd.Series):
