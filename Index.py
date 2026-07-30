@@ -239,3 +239,64 @@ elif selected_page == "📈 Regression":
 
 elif selected_page == "🌲 Ensemble (Random Forest)":
     render_model_page("Ensemble (Random Forest)", "🌲", "Ensemble classification using Random Forest.", "#06B6D4")
+    st.markdown("### 📊 1. ระบุหุ้นที่ต้องการวิเคราะห์")
+    
+    # ให้ผู้ใช้กรอกชื่อหุ้น
+    ticker_input = st.text_input("กรอกสัญลักษณ์หุ้น (เช่น AAPL, TSLA หรือ PTT.BK สำหรับหุ้นไทย)", value="AAPL")
+    
+    st.markdown("---")
+    
+    if st.button("🚀 ดึงข้อมูลล่าสุด & วิเคราะห์แนวโน้ม", use_container_width=True):
+        import pickle
+        import yfinance as yf
+        
+        try:
+            with st.spinner(f'กำลังดึงข้อมูลหุ้น {ticker_input} จากตลาดหลักทรัพย์...'):
+                # 1. โหลดสมอง AI
+                with open('stock_model.pkl', 'rb') as file:
+                    model = pickle.load(file)
+                
+                # 2. ดึงข้อมูลหุ้นตัวนั้นย้อนหลัง 60 วัน 
+                ticker_data = yf.download(ticker_input, period="60d")
+                
+                if ticker_data.empty:
+                    st.error("❌ ไม่พบข้อมูลหุ้นนี้ กรุณาตรวจสอบสัญลักษณ์ให้ถูกต้อง")
+                else:
+                    # 3. คำนวณอินดิเคเตอร์
+                    ticker_data['SMA_10'] = ticker_data['Close'].rolling(window=10).mean()
+                    ticker_data['SMA_30'] = ticker_data['Close'].rolling(window=30).mean()
+                    ticker_data['Volume_Change'] = ticker_data['Volume'].pct_change()
+                    
+                    # 4. ดึงข้อมูลวันล่าสุด
+                    latest_data = ticker_data.iloc[-1]
+                    latest_close = float(latest_data['Close'].iloc[0]) if isinstance(latest_data['Close'], pd.Series) else float(latest_data['Close'])
+                    
+                    input_features = [[
+                        float(latest_data['Close']), 
+                        float(latest_data['SMA_10']), 
+                        float(latest_data['SMA_30']), 
+                        float(latest_data['Volume_Change'])
+                    ]]
+                    
+                    # 5. ทำนายผล
+                    prediction = model.predict(input_features)
+                    
+                    # 6. แสดงผลลัพธ์
+                    st.success(f"วิเคราะห์ข้อมูลหุ้น {ticker_input} สำเร็จ!")
+                    
+                    col1, col2, col3 = st.columns(3)
+                    col1.metric("ราคาปิดล่าสุด", f"{latest_close:.2f}")
+                    col2.metric("SMA 10 วัน", f"{float(latest_data['SMA_10']):.2f}")
+                    col3.metric("SMA 30 วัน", f"{float(latest_data['SMA_30']):.2f}")
+                    
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    
+                    if prediction[0] == 1:
+                        st.markdown("<div style='background-color: #d1fae5; padding: 20px; border-radius: 10px; border-left: 5px solid #10B981;'><h2 style='text-align: center; color: #047857; margin: 0;'>🟢 สัญญาณ: แนะนำให้ซื้อ (Buy)</h2><p style='text-align: center; color: #065f46; margin-top: 10px;'>โมเดลคาดการณ์ว่าแนวโน้มราคาในวันทำการถัดไปจะเป็นขาขึ้น</p></div>", unsafe_allow_html=True)
+                    else:
+                        st.markdown("<div style='background-color: #fee2e2; padding: 20px; border-radius: 10px; border-left: 5px solid #EF4444;'><h2 style='text-align: center; color: #b91c1c; margin: 0;'>🔴 สัญญาณ: แนะนำให้ขาย / รอดูสถานการณ์</h2><p style='text-align: center; color: #991b1b; margin-top: 10px;'>โมเดลคาดการณ์ว่าแนวโน้มราคาในวันทำการถัดไปจะปรับตัวลง</p></div>", unsafe_allow_html=True)
+
+        except FileNotFoundError:
+            st.error("⚠️ ไม่พบไฟล์ 'stock_model.pkl' กรุณาตรวจสอบให้แน่ใจว่าได้นำไฟล์มาใส่ในโฟลเดอร์เดียวกับโค้ดแล้ว")
+        except Exception as e:
+            st.error(f"❌ เกิดข้อผิดพลาด: {e}")
