@@ -210,17 +210,13 @@ elif selected_page == "🧮 K-Nearest Neighbor (KNN)":
         import pickle
         try:
             with st.spinner('กำลังเปรียบเทียบโปรไฟล์กับฐานข้อมูลลูกค้า...'):
-                # 1. โหลดไฟล์โมเดล (Pipeline ที่มีตัว Scale ข้อมูลอยู่แล้ว)
-                with open('knn_loan_model.pkl', 'rb') as file:
+                # เปลี่ยน Path ไปที่ Models/
+                with open('Models/knn_loan_model.pkl', 'rb') as file:
                     model = pickle.load(file)
                 
-                # 2. จัดเตรียมข้อมูลให้ตรงกับตอน Train
                 input_data = [[income, loan_amount, work_exp, credit_score]]
-                
-                # 3. ทำนายผล
                 prediction = model.predict(input_data)
                 
-                # 4. แสดงผลลัพธ์
                 st.success("ประมวลผลเสร็จสิ้น!")
                 
                 st.markdown("### 📊 ผลการประเมินเบื้องต้น")
@@ -244,7 +240,7 @@ elif selected_page == "🧮 K-Nearest Neighbor (KNN)":
                     """, unsafe_allow_html=True)
                 
         except FileNotFoundError:
-            st.error("⚠️ ไม่พบไฟล์ 'knn_loan_model.pkl' กรุณาตรวจสอบให้แน่ใจว่าได้นำไฟล์มาใส่ในโฟลเดอร์โปรเจกต์แล้ว")
+            st.error("⚠️ ไม่พบไฟล์ 'Models/knn_loan_model.pkl' กรุณาตรวจสอบว่าได้สร้างโฟลเดอร์ Models และใส่ไฟล์ไว้แล้ว")
         except Exception as e:
             st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
@@ -272,17 +268,13 @@ elif selected_page == "🌳 Decision Tree":
         import pickle
         try:
             with st.spinner('กำลังใช้ Decision Tree วิเคราะห์รูปแบบข้อมูล...'):
-                # 1. โหลดไฟล์โมเดล
-                with open('dt_hr_model.pkl', 'rb') as file:
+                # เปลี่ยน Path ไปที่ Models/
+                with open('Models/dt_hr_model.pkl', 'rb') as file:
                     model = pickle.load(file)
                 
-                # 2. จัดเตรียมข้อมูล (เรียงให้ตรงกับตอน Train: Age, Income, Overtime, Satisfaction)
                 input_data = [[age, income, overtime_val, satisfaction]]
-                
-                # 3. ทำนายผล
                 prediction = model.predict(input_data)
                 
-                # 4. แสดงผลลัพธ์
                 st.success("การวิเคราะห์เสร็จสิ้น!")
                 
                 st.markdown("### 📊 ผลการประเมิน")
@@ -308,7 +300,7 @@ elif selected_page == "🌳 Decision Tree":
                     """, unsafe_allow_html=True)
                 
         except FileNotFoundError:
-            st.error("⚠️ ไม่พบไฟล์ 'dt_hr_model.pkl' กรุณาตรวจสอบให้แน่ใจว่าได้นำไฟล์มาใส่ในโฟลเดอร์เดียวกับโค้ดแล้ว")
+            st.error("⚠️ ไม่พบไฟล์ 'Models/dt_hr_model.pkl' กรุณาตรวจสอบว่าได้สร้างโฟลเดอร์ Models และใส่ไฟล์ไว้แล้ว")
         except Exception as e:
             st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
@@ -336,17 +328,13 @@ elif selected_page == "⚡ Support Vector Machine (SVM)":
         import pickle
         try:
             with st.spinner('กำลังใช้เทคโนโลยี SVM ตรวจสอบรูปแบบการทุจริต...'):
-                # 1. โหลดไฟล์โมเดล
-                with open('svm_fraud_model.pkl', 'rb') as file:
+                # เปลี่ยน Path ไปที่ Models/
+                with open('Models/svm_fraud_model.pkl', 'rb') as file:
                     model = pickle.load(file)
                 
-                # 2. จัดเตรียมข้อมูล (เรียงให้ตรง: Amount, Distance, International, Failed_PIN)
                 input_data = [[amount, distance, intl_txn, failed_pin]]
-                
-                # 3. ทำนายผล
                 prediction = model.predict(input_data)
                 
-                # 4. แสดงผลลัพธ์
                 st.success("ตรวจสอบข้อมูลเสร็จสิ้น!")
                 
                 st.markdown("### 📊 สถานะการทำรายการ")
@@ -372,7 +360,7 @@ elif selected_page == "⚡ Support Vector Machine (SVM)":
                     """, unsafe_allow_html=True)
                 
         except FileNotFoundError:
-            st.error("⚠️ ไม่พบไฟล์ 'svm_fraud_model.pkl' กรุณาตรวจสอบให้แน่ใจว่าได้นำไฟล์มาใส่ในโฟลเดอร์เดียวกับโค้ดแล้ว")
+            st.error("⚠️ ไม่พบไฟล์ 'Models/svm_fraud_model.pkl' กรุณาตรวจสอบว่าได้สร้างโฟลเดอร์ Models และใส่ไฟล์ไว้แล้ว")
         except Exception as e:
             st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
@@ -394,50 +382,43 @@ elif selected_page == "🌀 K-Means Clustering":
         import pandas as pd
         try:
             with st.spinner('กำลังให้ AI จัดกลุ่มเปรียบเทียบกับฐานข้อมูลลูกค้าทั้งหมด...'):
-                # 1. โหลดไฟล์โมเดล
-                with open('kmeans_customer_model.pkl', 'rb') as file:
+                # เปลี่ยน Path ไปที่ Models/
+                with open('Models/kmeans_customer_model.pkl', 'rb') as file:
                     model = pickle.load(file)
                 
-                # 2. จัดเตรียมข้อมูลในรูปแบบ DataFrame ป้องกัน Error
                 input_df = pd.DataFrame({'Income': [income_val], 'Spending': [spending_val]})
-                
-                # 3. ทำนายว่าอยู่กลุ่ม (Cluster) หมายเลขอะไร
                 cluster_id = model.predict(input_df)[0]
                 
-                # 4. เทคนิคขั้นสูง: ดึงข้อมูลจุดศูนย์กลางของกลุ่มนั้น มาวิเคราะห์พฤติกรรม
                 kmeans_step = model.named_steps['kmeans']
                 scaler_step = model.named_steps['scaler']
                 
-                # แปลงค่าศูนย์กลางกลับเป็นสเกลเงินบาทปกติ
                 centroid_scaled = kmeans_step.cluster_centers_[cluster_id]
                 centroid_real = scaler_step.inverse_transform([centroid_scaled])[0]
                 
                 center_income = centroid_real[0]
                 center_spending = centroid_real[1]
                 
-                # 5. วิเคราะห์ Persona จากจุดศูนย์กลาง
                 if center_income >= 60000 and center_spending >= 30000:
                     persona = "💎 ลูกค้าระดับพรีเมียม (VIP / High Roller)"
                     desc = "รายได้สูงและยอดใช้จ่ายสูงมาก เป็นกลุ่มลูกค้าที่สร้างกำไรหลักให้บริษัท"
                     promo = "เสนอโปรโมชั่นบัตรเครดิตระดับพรีเมียม, สิทธิ์เข้าเลานจ์สนามบิน, หรือของรางวัลแบรนด์เนม"
-                    bg_color, text_color = "#fdf4ff", "#86198f" # โทนม่วง VIP
+                    bg_color, text_color = "#fdf4ff", "#86198f" 
                 elif center_income >= 60000 and center_spending < 30000:
                     persona = "🛡️ กลุ่มมีกำลังซื้อแต่เน้นออม (Conservative)"
                     desc = "รายได้สูงแต่ระมัดระวังการใช้จ่าย (ยอดใช้จ่ายน้อยกว่าที่ควรจะเป็น)"
                     promo = "เสนอโปรโมชั่น Cash Back เงินคืน, แนะนำกองทุนรวม, หรือประกันสะสมทรัพย์"
-                    bg_color, text_color = "#f0fdf4", "#166534" # โทนเขียวความมั่นคง
+                    bg_color, text_color = "#f0fdf4", "#166534" 
                 elif center_income < 60000 and center_spending >= 20000:
                     persona = "🛍️ กลุ่มชอบใช้จ่าย (Trend Spender)"
                     desc = "รายได้ปานกลางถึงน้อย แต่มีพฤติกรรมการช้อปปิ้งและยอดใช้จ่ายสูง"
                     promo = "เสนอโปรโมชั่นผ่อน 0% นาน 10 เดือน, สินเชื่อส่วนบุคคล, หรือคะแนนสะสมคูณสอง"
-                    bg_color, text_color = "#fff7ed", "#c2410c" # โทนส้มกระตุ้นการซื้อ
+                    bg_color, text_color = "#fff7ed", "#c2410c" 
                 else:
                     persona = "🛒 กลุ่มใช้จ่ายตามความจำเป็น (Sensible Saver)"
                     desc = "รายได้ปานกลาง/น้อย และมียอดใช้จ่ายในระดับทั่วไป ไม่หวือหวา"
                     promo = "เสนอส่วนลดร้านสะดวกซื้อ, ซูเปอร์มาร์เก็ต, หรือโปรโมชั่นเติมน้ำมัน/จ่ายบิล"
-                    bg_color, text_color = "#f0f9ff", "#0369a1" # โทนฟ้ามาตรฐาน
+                    bg_color, text_color = "#f0f9ff", "#0369a1" 
                 
-                # 6. แสดงผลลัพธ์
                 st.success("จัดกลุ่มลูกค้าเสร็จสิ้น!")
                 
                 st.markdown(f"""
@@ -450,7 +431,7 @@ elif selected_page == "🌀 K-Means Clustering":
                 """, unsafe_allow_html=True)
                 
         except FileNotFoundError:
-            st.error("⚠️ ไม่พบไฟล์ 'kmeans_customer_model.pkl' กรุณาตรวจสอบให้แน่ใจว่าได้นำไฟล์มาใส่ในโฟลเดอร์เดียวกับโค้ดแล้ว")
+            st.error("⚠️ ไม่พบไฟล์ 'Models/kmeans_customer_model.pkl' กรุณาตรวจสอบว่าได้สร้างโฟลเดอร์ Models และใส่ไฟล์ไว้แล้ว")
         except Exception as e:
             st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
@@ -474,11 +455,10 @@ elif selected_page == "📈 Regression":
         import pandas as pd
         try:
             with st.spinner('กำลังคำนวณและสร้างโมเดลคาดการณ์ทางการเงิน...'):
-                # 1. โหลดไฟล์โมเดล
-                with open('regression_franchise_model.pkl', 'rb') as file:
+                # เปลี่ยน Path ไปที่ Models/
+                with open('Models/regression_franchise_model.pkl', 'rb') as file:
                     model = pickle.load(file)
                 
-                # 2. จัดเตรียมข้อมูล (Area, Population, Marketing, Competitor_Dist)
                 input_df = pd.DataFrame({
                     'Area': [area],
                     'Population': [population],
@@ -486,26 +466,20 @@ elif selected_page == "📈 Regression":
                     'Competitor_Dist': [competitor_dist]
                 })
                 
-                # 3. ทำนายผลยอดขาย (Revenue)
                 predicted_revenue = model.predict(input_df)[0]
                 
-                # จำลองโครงสร้างต้นทุน (Financial Assumption)
-                # สมมติให้ต้นทุนคงที่+ผันแปร ประมาณ 75% ของยอดขาย
                 estimated_cost = predicted_revenue * 0.75
                 net_profit = predicted_revenue - estimated_cost
                 margin_percent = (net_profit / predicted_revenue) * 100
                 
-                # 4. แสดงผลลัพธ์
                 st.success("การประเมินทางการเงินเสร็จสิ้น!")
                 
                 st.markdown("### 📊 รายงานคาดการณ์ทางการเงิน (ต่อเดือน)")
                 
-                # แสดงเป็นตัวเลข Dashboard สวยๆ
                 m_col1, m_col2, m_col3 = st.columns(3)
                 m_col1.metric("💰 คาดการณ์ยอดขายรวม", f"฿{predicted_revenue:,.2f}")
                 m_col2.metric("📉 ต้นทุนประเมิน (75%)", f"฿{estimated_cost:,.2f}")
                 
-                # ตกแต่งสีให้กำไร
                 if net_profit > 0:
                     m_col3.metric("📈 กำไรสุทธิคาดการณ์", f"฿{net_profit:,.2f}", f"{margin_percent:.1f}% Margin")
                     st.markdown(f"""
@@ -524,7 +498,7 @@ elif selected_page == "📈 Regression":
                     """, unsafe_allow_html=True)
 
         except FileNotFoundError:
-            st.error("⚠️ ไม่พบไฟล์ 'regression_franchise_model.pkl' กรุณาตรวจสอบให้แน่ใจว่าได้นำไฟล์มาใส่ในโฟลเดอร์เดียวกับโค้ดแล้ว")
+            st.error("⚠️ ไม่พบไฟล์ 'Models/regression_franchise_model.pkl' กรุณาตรวจสอบว่าได้สร้างโฟลเดอร์ Models และใส่ไฟล์ไว้แล้ว")
         except Exception as e:
             st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
@@ -533,7 +507,6 @@ elif selected_page == "🌲 Ensemble (Random Forest)":
     
     st.markdown("### 📊 1. ระบุหุ้นที่ต้องการวิเคราะห์")
     
-    # ⚠️ บรรทัดนี้แหละครับที่น่าจะหายไป!
     ticker_input = st.text_input("กรอกสัญลักษณ์หุ้น (เช่น AAPL, TSLA หรือ PTT.BK สำหรับหุ้นไทย)", value="AAPL")
     
     st.markdown("---")
@@ -545,25 +518,21 @@ elif selected_page == "🌲 Ensemble (Random Forest)":
         
         try:
             with st.spinner(f'กำลังดึงข้อมูลหุ้น {ticker_input} จากตลาดหลักทรัพย์...'):
-                # 1. โหลดสมอง AI
-                with open('stock_model.pkl', 'rb') as file:
+                # เปลี่ยน Path ไปที่ Models/
+                with open('Models/stock_model.pkl', 'rb') as file:
                     model = pickle.load(file)
                 
-                # 2. ดึงข้อมูลหุ้นตัวนั้นย้อนหลัง 60 วัน 
                 ticker_data = yf.download(ticker_input, period="60d")
                 
                 if ticker_data.empty:
                     st.error("❌ ไม่พบข้อมูลหุ้นนี้ กรุณาตรวจสอบสัญลักษณ์ให้ถูกต้อง")
                 else:
-                    # 3. คำนวณอินดิเคเตอร์
                     ticker_data['SMA_10'] = ticker_data['Close'].rolling(window=10).mean()
                     ticker_data['SMA_30'] = ticker_data['Close'].rolling(window=30).mean()
                     ticker_data['Volume_Change'] = ticker_data['Volume'].pct_change()
                     
-                    # 4. ดึงข้อมูลวันล่าสุด (รองรับ yfinance เวอร์ชั่นใหม่)
                     latest_data = ticker_data.iloc[-1]
                     
-                    # ฟังก์ชันช่วยดึงค่าตัวเลขออกมาให้ปลอดภัย
                     def get_safe_float(column_name):
                         val = latest_data[column_name]
                         if isinstance(val, pd.Series):
@@ -577,10 +546,8 @@ elif selected_page == "🌲 Ensemble (Random Forest)":
                     
                     input_features = [[latest_close, latest_sma_10, latest_sma_30, latest_vol_change]]
                     
-                    # 5. ทำนายผล
                     prediction = model.predict(input_features)
                     
-                    # 6. แสดงผลลัพธ์
                     st.success(f"วิเคราะห์ข้อมูลหุ้น {ticker_input} สำเร็จ!")
                     
                     col1, col2, col3 = st.columns(3)
@@ -596,6 +563,6 @@ elif selected_page == "🌲 Ensemble (Random Forest)":
                         st.markdown("<div style='background-color: #fee2e2; padding: 20px; border-radius: 10px; border-left: 5px solid #EF4444;'><h2 style='text-align: center; color: #b91c1c; margin: 0;'>🔴 สัญญาณ: แนะนำให้ขาย / รอดูสถานการณ์</h2><p style='text-align: center; color: #991b1b; margin-top: 10px;'>โมเดลคาดการณ์ว่าแนวโน้มราคาในวันทำการถัดไปจะปรับตัวลง</p></div>", unsafe_allow_html=True)
 
         except FileNotFoundError:
-            st.error("⚠️ ไม่พบไฟล์ 'stock_model.pkl' กรุณาตรวจสอบให้แน่ใจว่าได้นำไฟล์มาใส่ในโฟลเดอร์เดียวกับโค้ดแล้ว")
+            st.error("⚠️ ไม่พบไฟล์ 'Models/stock_model.pkl' กรุณาตรวจสอบว่าได้สร้างโฟลเดอร์ Models และใส่ไฟล์ไว้แล้ว")
         except Exception as e:
             st.error(f"❌ เกิดข้อผิดพลาด: {e}")
