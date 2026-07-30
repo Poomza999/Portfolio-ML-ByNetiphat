@@ -72,7 +72,7 @@ with st.sidebar:
     st.markdown("""
         <div style="text-align: center; margin-bottom: 20px;">
             <img src="https://cdn-icons-png.flaticon.com/512/4140/4140037.png" width="90" style="border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 10px;">
-            <h3 style="margin: 0; font-size: 0.9rem; color: #475569;"><b style="color: #1E293B;">ผู้พัฒนา</h3>
+            <h3 style="margin: 0; font-size: 2rem; color: #00FF00;"><b style="color: #2CFF05;">ผู้พัฒนา</h3>
         </div>
     """, unsafe_allow_html=True)
     
