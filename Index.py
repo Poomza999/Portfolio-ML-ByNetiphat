@@ -199,7 +199,7 @@ elif selected_page == "🧮 K-Nearest Neighbor (KNN)":
         income = st.number_input("รายได้ต่อเดือน (บาท)", min_value=0, value=35000, step=1000)
         loan_amount = st.number_input("ยอดเงินที่ขอกู้ (บาท)", min_value=0, value=500000, step=10000)
     with col2:
-        work_exp = st.number_input("อายุงาน (ปี)", min_value=0, max_value=50, value=3)
+        work_exp = st.number_input("อายุงาน (ปี)", min_value=0, max_value=100, value=3)
         credit_score = st.slider("คะแนนเครดิตบูโร (Credit Score)", min_value=300, max_value=850, value=650)
         st.markdown("<small style='color:gray;'>* 300=แย่มาก, 850=ดีเยี่ยม</small>", unsafe_allow_html=True)
         
@@ -249,7 +249,68 @@ elif selected_page == "🧮 K-Nearest Neighbor (KNN)":
             st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
 elif selected_page == "🌳 Decision Tree":
-    render_model_page("Decision Tree", "🌳", "Classification using Decision Tree algorithm.", "#10B981")
+    render_model_page("Decision Tree", "🌳", "ระบบวิเคราะห์ความเสี่ยงพนักงานลาออก (HR Analytics) ด้วย Decision Tree", "#10B981")
+    
+    st.markdown("### 📋 1. กรอกข้อมูลโปรไฟล์พนักงาน")
+    
+    # สร้างฟอร์มกรอกข้อมูลแบบ 2 คอลัมน์
+    col1, col2 = st.columns(2)
+    with col1:
+        age = st.number_input("อายุพนักงาน (ปี)", min_value=18, max_value=65, value=30)
+        income = st.number_input("เงินเดือน (บาท)", min_value=9000, value=30000, step=1000)
+    with col2:
+        overtime_input = st.selectbox("การทำงานล่วงเวลา (Overtime)", options=["ไม่ทำ (No)", "ทำ (Yes)"])
+        satisfaction = st.slider("ระดับความพึงพอใจในงาน (1=แย่สุด, 4=ดีมาก)", min_value=1, max_value=4, value=3)
+    
+    # แปลงข้อความ Overtime เป็นตัวเลข (1 หรือ 0) เพื่อส่งให้โมเดล
+    overtime_val = 1 if overtime_input == "ทำ (Yes)" else 0
+        
+    st.markdown("---")
+    
+    # ปุ่มกดเพื่อทำนาย
+    if st.button("🚀 ประเมินความเสี่ยงการลาออก", use_container_width=True):
+        import pickle
+        try:
+            with st.spinner('กำลังใช้ Decision Tree วิเคราะห์รูปแบบข้อมูล...'):
+                # 1. โหลดไฟล์โมเดล
+                with open('dt_hr_model.pkl', 'rb') as file:
+                    model = pickle.load(file)
+                
+                # 2. จัดเตรียมข้อมูล (เรียงให้ตรงกับตอน Train: Age, Income, Overtime, Satisfaction)
+                input_data = [[age, income, overtime_val, satisfaction]]
+                
+                # 3. ทำนายผล
+                prediction = model.predict(input_data)
+                
+                # 4. แสดงผลลัพธ์
+                st.success("การวิเคราะห์เสร็จสิ้น!")
+                
+                st.markdown("### 📊 ผลการประเมิน")
+                if prediction[0] == 1:
+                    st.markdown("""
+                    <div style='background-color: #fee2e2; padding: 20px; border-radius: 10px; border-left: 5px solid #EF4444; text-align: center;'>
+                        <h2 style='color: #b91c1c; margin: 0;'>🔴 ความเสี่ยงสูง (High Risk of Attrition)</h2>
+                        <p style='color: #991b1b; margin-top: 10px; font-size: 1.1rem;'>
+                            พนักงานมีแนวโน้มที่จะ <b>ลาออก</b> สูง <br>
+                            <i>ข้อแนะนำ HR: ควรเรียกคุยเพื่อสอบถามความพึงพอใจ หรือพิจารณาปรับฐานเงินเดือน/ลดภาระงาน OT</i>
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.markdown("""
+                    <div style='background-color: #d1fae5; padding: 20px; border-radius: 10px; border-left: 5px solid #10B981; text-align: center;'>
+                        <h2 style='color: #047857; margin: 0;'>🟢 ความเสี่ยงต่ำ (Low Risk / Retained)</h2>
+                        <p style='color: #065f46; margin-top: 10px; font-size: 1.1rem;'>
+                            พนักงานมีแนวโน้มที่จะ <b>อยู่กับองค์กรต่อ</b> <br>
+                            <i>สถานการณ์ปกติ พนักงานมีความพึงพอใจกับสมดุลการทำงานและรายได้</i>
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+        except FileNotFoundError:
+            st.error("⚠️ ไม่พบไฟล์ 'dt_hr_model.pkl' กรุณาตรวจสอบให้แน่ใจว่าได้นำไฟล์มาใส่ในโฟลเดอร์เดียวกับโค้ดแล้ว")
+        except Exception as e:
+            st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
 elif selected_page == "⚡ Support Vector Machine (SVM)":
     render_model_page("Support Vector Machine (SVM)", "⚡", "Classification using SVM algorithm.", "#F59E0B")
