@@ -361,6 +361,7 @@ elif selected_page == "📈 Regression":
     render_model_page("Regression", "📈", "ระบบคาดการณ์ยอดขายรายเดือนและประเมินกำไรธุรกิจ (Revenue Forecasting)", "#EF4444")
     
     st.markdown("### 🏬 1. ระบุข้อมูลทำเลที่ตั้งสาขาใหม่")
+    
     col1, col2 = st.columns(2)
     with col1:
         area = st.number_input("ขนาดพื้นที่ร้าน (ตารางเมตร)", min_value=10, max_value=500, value=80)
@@ -372,34 +373,56 @@ elif selected_page == "📈 Regression":
     st.markdown("---")
     
     if st.button("🚀 ประเมินยอดขายและการลงทุน", use_container_width=True):
+        import pickle
+        import pandas as pd
         try:
             with st.spinner('กำลังคำนวณและสร้างโมเดลคาดการณ์ทางการเงิน...'):
                 with open('Models/regression_franchise_model.pkl', 'rb') as file:
                     model = pickle.load(file)
                 
                 input_df = pd.DataFrame({
-                    'Area': [area], 'Population': [population],
-                    'Marketing': [marketing], 'Competitor_Dist': [competitor_dist]
+                    'Area': [area], 
+                    'Population': [population],
+                    'Marketing': [marketing], 
+                    'Competitor_Dist': [competitor_dist]
                 })
                 
                 predicted_revenue = model.predict(input_df)[0]
-                estimated_cost = predicted_revenue * 0.75
-                net_profit = predicted_revenue - estimated_cost
-                margin_percent = (net_profit / predicted_revenue) * 100
+                
+                # ปรับสูตรต้นทุน: ต้นทุนวัตถุดิบ 60% + ค่าใช้จ่ายคงที่ (ค่าเช่า+พนักงานตามขนาดพื้นที่) 30,000 บาท
+                fixed_cost = 30000 + (area * 200) 
+                variable_cost = predicted_revenue * 0.60
+                total_cost = fixed_cost + variable_cost
+                
+                net_profit = predicted_revenue - total_cost
+                margin_percent = (net_profit / predicted_revenue) * 100 if predicted_revenue > 0 else 0
                 
                 st.success("การประเมินทางการเงินเสร็จสิ้น!")
                 st.markdown("### 📊 รายงานคาดการณ์ทางการเงิน (ต่อเดือน)")
                 
                 m_col1, m_col2, m_col3 = st.columns(3)
                 m_col1.metric("💰 ยอดขายรวม", f"฿{predicted_revenue:,.2f}")
-                m_col2.metric("📉 ต้นทุน (75%)", f"฿{estimated_cost:,.2f}")
+                m_col2.metric("📉 ต้นทุนรวม (ค่าใช้จ่าย)", f"฿{total_cost:,.2f}")
                 
                 if net_profit > 0:
                     m_col3.metric("📈 กำไรสุทธิ", f"฿{net_profit:,.2f}", f"{margin_percent:.1f}% Margin")
-                    st.markdown("<div style='background-color: #f0fdf4; padding: 20px; border-radius: 10px; border-left: 5px solid #22c55e;'><h4 style='color: #166534; margin: 0;'>✅ น่าลงทุน</h4></div>", unsafe_allow_html=True)
+                    st.markdown("""
+                    <div style='background-color: #f0fdf4; padding: 20px; border-radius: 10px; border-left: 5px solid #22c55e;'>
+                        <h4 style='color: #166534; margin: 0;'>✅ สรุปความคุ้มค่าการลงทุน: น่าลงทุน</h4>
+                        <p style='color: #15803d; margin-top: 5px;'>ทำเลนี้มีศักยภาพในการทำกำไรคุ้มค่ากับต้นทุนและค่าใช้จ่ายคงที่</p>
+                    </div>
+                    """, unsafe_allow_html=True)
                 else:
                     m_col3.metric("⚠️ ขาดทุนสุทธิ", f"฿{net_profit:,.2f}", f"{margin_percent:.1f}% Margin", delta_color="inverse")
-                    st.markdown("<div style='background-color: #fef2f2; padding: 20px; border-radius: 10px; border-left: 5px solid #ef4444;'><h4 style='color: #991b1b; margin: 0;'>❌ ความเสี่ยงสูง</h4></div>", unsafe_allow_html=True)
+                    st.markdown("""
+                    <div style='background-color: #fef2f2; padding: 20px; border-radius: 10px; border-left: 5px solid #ef4444;'>
+                        <h4 style='color: #991b1b; margin: 0;'>❌ สรุปความคุ้มค่าการลงทุน: มีความเสี่ยงสูง (ไม่น่าลงทุน)</h4>
+                        <p style='color: #b91c1c; margin-top: 5px;'>ยอดขายไม่สามารถครอบคลุมค่าใช้จ่ายคงที่และต้นทุนได้ ร้านอาจประสบภาวะขาดทุน</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+        except FileNotFoundError:
+            st.error("⚠️ ไม่พบไฟล์ 'Models/regression_franchise_model.pkl' กรุณาตรวจสอบว่าได้สร้างโฟลเดอร์ Models และใส่ไฟล์ไว้แล้ว")
         except Exception as e:
             st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
