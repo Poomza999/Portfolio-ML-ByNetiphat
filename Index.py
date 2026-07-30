@@ -188,6 +188,42 @@ if selected_page == "🏠 หน้าหลัก (Home)":
 
 elif selected_page == "🧮 K-Nearest Neighbor (KNN)":
     render_model_page("K-Nearest Neighbor (KNN)", "🧮", "Classification using the KNN algorithm.", "#3B82F6")
+    
+    st.markdown("### 📥 1. ป้อนข้อมูลขนาดดอกไม้ (เซนติเมตร)")
+    
+    # สร้างช่องกรอกข้อมูล 4 ช่องตาม Dataset ของ Iris
+    col1, col2 = st.columns(2)
+    with col1:
+        sepal_length = st.number_input("ความยาวกลีบเลี้ยง (Sepal Length)", min_value=0.0, value=5.1)
+        petal_length = st.number_input("ความยาวกลีบดอก (Petal Length)", min_value=0.0, value=1.4)
+    with col2:
+        sepal_width = st.number_input("ความกว้างกลีบเลี้ยง (Sepal Width)", min_value=0.0, value=3.5)
+        petal_width = st.number_input("ความกว้างกลีบดอก (Petal Width)", min_value=0.0, value=0.2)
+        
+    st.markdown("---")
+    
+    # ปุ่มกดเพื่อทำนาย
+    if st.button("🚀 ทำนายสายพันธุ์ (Predict)", use_container_width=True):
+        try:
+            # 1. โหลดไฟล์โมเดลที่เราเทรนไว้
+            import pickle
+            with open('knn_model.pkl', 'rb') as file:
+                model = pickle.load(file)
+            
+            # 2. นำข้อมูลที่ผู้ใช้กรอก ไปเข้าโมเดล
+            input_data = [[sepal_length, sepal_width, petal_length, petal_width]]
+            prediction = model.predict(input_data)
+            
+            # 3. แปลงผลลัพธ์จากตัวเลข (0,1,2) เป็นชื่อสายพันธุ์
+            species = ['Setosa (เซโตซา)', 'Versicolor (เวอร์ซิคัลเลอร์)', 'Virginica (เวอร์จินิกา)']
+            result = species[prediction[0]]
+            
+            # 4. แสดงผลลัพธ์บนหน้าเว็บ
+            st.success("ประมวลผลสำเร็จ!")
+            st.markdown(f"<h3 style='text-align: center; color: #10B981;'>🌸 ผลการทำนาย: ดอกไอริสสายพันธุ์ {result}</h3>", unsafe_allow_html=True)
+            
+        except FileNotFoundError:
+            st.error("⚠️ ไม่พบไฟล์ 'knn_model.pkl' กรุณารันโค้ด Train โมเดลก่อนครับ")
 
 elif selected_page == "🌳 Decision Tree":
     render_model_page("Decision Tree", "🌳", "Classification using Decision Tree algorithm.", "#10B981")
