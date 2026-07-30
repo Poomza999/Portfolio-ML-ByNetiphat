@@ -377,7 +377,82 @@ elif selected_page == "⚡ Support Vector Machine (SVM)":
             st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
 elif selected_page == "🌀 K-Means Clustering":
-    render_model_page("K-Means Clustering", "🌀", "Unsupervised clustering using K-Means.", "#8B5CF6")
+    render_model_page("K-Means Clustering", "🌀", "ระบบจัดกลุ่มลูกค้าบัตรเครดิตเพื่อเสนอโปรโมชั่น (Customer Segmentation)", "#8B5CF6")
+    
+    st.markdown("### 💳 1. กรอกข้อมูลพฤติกรรมการเงินของลูกค้า")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        income_val = st.number_input("รายได้เฉลี่ยต่อเดือน (บาท)", min_value=10000, max_value=500000, value=45000, step=5000)
+    with col2:
+        spending_val = st.number_input("ยอดใช้จ่ายผ่านบัตรเฉลี่ยต่อเดือน (บาท)", min_value=0, max_value=500000, value=15000, step=1000)
+        
+    st.markdown("---")
+    
+    if st.button("🚀 วิเคราะห์และจัดกลุ่มลูกค้า", use_container_width=True):
+        import pickle
+        import pandas as pd
+        try:
+            with st.spinner('กำลังให้ AI จัดกลุ่มเปรียบเทียบกับฐานข้อมูลลูกค้าทั้งหมด...'):
+                # 1. โหลดไฟล์โมเดล
+                with open('kmeans_customer_model.pkl', 'rb') as file:
+                    model = pickle.load(file)
+                
+                # 2. จัดเตรียมข้อมูลในรูปแบบ DataFrame ป้องกัน Error
+                input_df = pd.DataFrame({'Income': [income_val], 'Spending': [spending_val]})
+                
+                # 3. ทำนายว่าอยู่กลุ่ม (Cluster) หมายเลขอะไร
+                cluster_id = model.predict(input_df)[0]
+                
+                # 4. เทคนิคขั้นสูง: ดึงข้อมูลจุดศูนย์กลางของกลุ่มนั้น มาวิเคราะห์พฤติกรรม
+                kmeans_step = model.named_steps['kmeans']
+                scaler_step = model.named_steps['scaler']
+                
+                # แปลงค่าศูนย์กลางกลับเป็นสเกลเงินบาทปกติ
+                centroid_scaled = kmeans_step.cluster_centers_[cluster_id]
+                centroid_real = scaler_step.inverse_transform([centroid_scaled])[0]
+                
+                center_income = centroid_real[0]
+                center_spending = centroid_real[1]
+                
+                # 5. วิเคราะห์ Persona จากจุดศูนย์กลาง
+                if center_income >= 60000 and center_spending >= 30000:
+                    persona = "💎 ลูกค้าระดับพรีเมียม (VIP / High Roller)"
+                    desc = "รายได้สูงและยอดใช้จ่ายสูงมาก เป็นกลุ่มลูกค้าที่สร้างกำไรหลักให้บริษัท"
+                    promo = "เสนอโปรโมชั่นบัตรเครดิตระดับพรีเมียม, สิทธิ์เข้าเลานจ์สนามบิน, หรือของรางวัลแบรนด์เนม"
+                    bg_color, text_color = "#fdf4ff", "#86198f" # โทนม่วง VIP
+                elif center_income >= 60000 and center_spending < 30000:
+                    persona = "🛡️ กลุ่มมีกำลังซื้อแต่เน้นออม (Conservative)"
+                    desc = "รายได้สูงแต่ระมัดระวังการใช้จ่าย (ยอดใช้จ่ายน้อยกว่าที่ควรจะเป็น)"
+                    promo = "เสนอโปรโมชั่น Cash Back เงินคืน, แนะนำกองทุนรวม, หรือประกันสะสมทรัพย์"
+                    bg_color, text_color = "#f0fdf4", "#166534" # โทนเขียวความมั่นคง
+                elif center_income < 60000 and center_spending >= 20000:
+                    persona = "🛍️ กลุ่มชอบใช้จ่าย (Trend Spender)"
+                    desc = "รายได้ปานกลางถึงน้อย แต่มีพฤติกรรมการช้อปปิ้งและยอดใช้จ่ายสูง"
+                    promo = "เสนอโปรโมชั่นผ่อน 0% นาน 10 เดือน, สินเชื่อส่วนบุคคล, หรือคะแนนสะสมคูณสอง"
+                    bg_color, text_color = "#fff7ed", "#c2410c" # โทนส้มกระตุ้นการซื้อ
+                else:
+                    persona = "🛒 กลุ่มใช้จ่ายตามความจำเป็น (Sensible Saver)"
+                    desc = "รายได้ปานกลาง/น้อย และมียอดใช้จ่ายในระดับทั่วไป ไม่หวือหวา"
+                    promo = "เสนอส่วนลดร้านสะดวกซื้อ, ซูเปอร์มาร์เก็ต, หรือโปรโมชั่นเติมน้ำมัน/จ่ายบิล"
+                    bg_color, text_color = "#f0f9ff", "#0369a1" # โทนฟ้ามาตรฐาน
+                
+                # 6. แสดงผลลัพธ์
+                st.success("จัดกลุ่มลูกค้าเสร็จสิ้น!")
+                
+                st.markdown(f"""
+                <div style='background-color: {bg_color}; padding: 25px; border-radius: 12px; border-top: 5px solid {text_color}; box-shadow: 0 4px 6px rgba(0,0,0,0.05);'>
+                    <h2 style='color: {text_color}; margin-top: 0;'>{persona}</h2>
+                    <p style='color: #475569; font-size: 1.1rem; margin-bottom: 5px;'><b>พฤติกรรม:</b> {desc}</p>
+                    <hr style='border-color: {text_color}40; margin: 15px 0;'>
+                    <p style='color: {text_color}; font-size: 1.1rem; margin: 0;'><b>💡 ข้อเสนอแนะทางการตลาด:</b> {promo}</p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+        except FileNotFoundError:
+            st.error("⚠️ ไม่พบไฟล์ 'kmeans_customer_model.pkl' กรุณาตรวจสอบให้แน่ใจว่าได้นำไฟล์มาใส่ในโฟลเดอร์เดียวกับโค้ดแล้ว")
+        except Exception as e:
+            st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
 elif selected_page == "📈 Regression":
     render_model_page("Regression", "📈", "Regression prediction model for continuous data.", "#EF4444")
