@@ -189,42 +189,64 @@ if selected_page == "🏠 หน้าหลัก (Home)":
     create_card(col3, "🌲", "Random Forest", "Ensemble classification using Random Forest.", "#06B6D4", "🌲 Ensemble (Random Forest)")
 
 elif selected_page == "🧮 K-Nearest Neighbor (KNN)":
-    render_model_page("K-Nearest Neighbor (KNN)", "🧮", "Classification using the KNN algorithm.", "#3B82F6")
+    render_model_page("K-Nearest Neighbor (KNN)", "🧮", "ระบบประเมินความเสี่ยงและอนุมัติสินเชื่อ (Loan Approval) ด้วย KNN", "#3B82F6")
     
-    st.markdown("### 📥 1. ป้อนข้อมูลขนาดดอกไม้ (เซนติเมตร)")
+    st.markdown("### 📋 1. กรอกข้อมูลผู้ขอสินเชื่อ")
     
-    # สร้างช่องกรอกข้อมูล 4 ช่องตาม Dataset ของ Iris
+    # สร้างฟอร์มกรอกข้อมูลแบบ 2 คอลัมน์
     col1, col2 = st.columns(2)
     with col1:
-        sepal_length = st.number_input("ความยาวกลีบเลี้ยง (Sepal Length)", min_value=0.0, value=5.1)
-        petal_length = st.number_input("ความยาวกลีบดอก (Petal Length)", min_value=0.0, value=1.4)
+        income = st.number_input("รายได้ต่อเดือน (บาท)", min_value=0, value=35000, step=1000)
+        loan_amount = st.number_input("ยอดเงินที่ขอกู้ (บาท)", min_value=0, value=500000, step=10000)
     with col2:
-        sepal_width = st.number_input("ความกว้างกลีบเลี้ยง (Sepal Width)", min_value=0.0, value=3.5)
-        petal_width = st.number_input("ความกว้างกลีบดอก (Petal Width)", min_value=0.0, value=0.2)
+        work_exp = st.number_input("อายุงาน (ปี)", min_value=0, max_value=50, value=3)
+        credit_score = st.slider("คะแนนเครดิตบูโร (Credit Score)", min_value=300, max_value=850, value=650)
+        st.markdown("<small style='color:gray;'>* 300=แย่มาก, 850=ดีเยี่ยม</small>", unsafe_allow_html=True)
         
     st.markdown("---")
     
     # ปุ่มกดเพื่อทำนาย
-    if st.button("🚀 ทำนายสายพันธุ์ (Predict)", use_container_width=True):
+    if st.button("🚀 ประเมินความเสี่ยงสินเชื่อ", use_container_width=True):
+        import pickle
         try:
-            # 1. โหลดไฟล์โมเดลที่เราเทรนไว้
-            with open('knn_model.pkl', 'rb') as file:
-                model = pickle.load(file)
-            
-            # 2. นำข้อมูลที่ผู้ใช้กรอก ไปเข้าโมเดล
-            input_data = [[sepal_length, sepal_width, petal_length, petal_width]]
-            prediction = model.predict(input_data)
-            
-            # 3. แปลงผลลัพธ์จากตัวเลข (0,1,2) เป็นชื่อสายพันธุ์
-            species = ['Setosa (เซโตซา)', 'Versicolor (เวอร์ซิคัลเลอร์)', 'Virginica (เวอร์จินิกา)']
-            result = species[prediction[0]]
-            
-            # 4. แสดงผลลัพธ์บนหน้าเว็บ
-            st.success("ประมวลผลสำเร็จ!")
-            st.markdown(f"<h3 style='text-align: center; color: #10B981;'>🌸 ผลการทำนาย: ดอกไอริสสายพันธุ์ {result}</h3>", unsafe_allow_html=True)
-            
+            with st.spinner('กำลังเปรียบเทียบโปรไฟล์กับฐานข้อมูลลูกค้า...'):
+                # 1. โหลดไฟล์โมเดล (Pipeline ที่มีตัว Scale ข้อมูลอยู่แล้ว)
+                with open('knn_loan_model.pkl', 'rb') as file:
+                    model = pickle.load(file)
+                
+                # 2. จัดเตรียมข้อมูลให้ตรงกับตอน Train
+                input_data = [[income, loan_amount, work_exp, credit_score]]
+                
+                # 3. ทำนายผล
+                prediction = model.predict(input_data)
+                
+                # 4. แสดงผลลัพธ์
+                st.success("ประมวลผลเสร็จสิ้น!")
+                
+                st.markdown("### 📊 ผลการประเมินเบื้องต้น")
+                if prediction[0] == 1:
+                    st.markdown("""
+                    <div style='background-color: #d1fae5; padding: 20px; border-radius: 10px; border-left: 5px solid #10B981; text-align: center;'>
+                        <h2 style='color: #047857; margin: 0;'>🟢 อนุมัติสินเชื่อ (Approved)</h2>
+                        <p style='color: #065f46; margin-top: 10px; font-size: 1.1rem;'>
+                            โปรไฟล์มีความน่าเชื่อถือและมีความเสี่ยงต่ำ (ใกล้เคียงกับกลุ่มลูกค้าประวัติดี)
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.markdown("""
+                    <div style='background-color: #fee2e2; padding: 20px; border-radius: 10px; border-left: 5px solid #EF4444; text-align: center;'>
+                        <h2 style='color: #b91c1c; margin: 0;'>🔴 ไม่อนุมัติ / ความเสี่ยงสูง (Rejected)</h2>
+                        <p style='color: #991b1b; margin-top: 10px; font-size: 1.1rem;'>
+                            โปรไฟล์มีความเสี่ยงสูง (ใกล้เคียงกับกลุ่มลูกค้าหนี้เสีย) แนะนำให้ลดวงเงินกู้หรือเพิ่มเครดิตสกอร์
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
         except FileNotFoundError:
-            st.error("⚠️ ไม่พบไฟล์ 'knn_model.pkl' กรุณารันโค้ด Train โมเดลก่อนครับ")
+            st.error("⚠️ ไม่พบไฟล์ 'knn_loan_model.pkl' กรุณาตรวจสอบให้แน่ใจว่าได้นำไฟล์มาใส่ในโฟลเดอร์โปรเจกต์แล้ว")
+        except Exception as e:
+            st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
 elif selected_page == "🌳 Decision Tree":
     render_model_page("Decision Tree", "🌳", "Classification using Decision Tree algorithm.", "#10B981")
