@@ -256,7 +256,7 @@ elif selected_page == "🌳 Decision Tree":
     # สร้างฟอร์มกรอกข้อมูลแบบ 2 คอลัมน์
     col1, col2 = st.columns(2)
     with col1:
-        age = st.number_input("อายุพนักงาน (ปี)", min_value=18, max_value=65, value=30)
+        age = st.number_input("อายุพนักงาน (ปี)", min_value=18, max_value=80, value=30)
         income = st.number_input("เงินเดือน (บาท)", min_value=9000, value=30000, step=1000)
     with col2:
         overtime_input = st.selectbox("การทำงานล่วงเวลา (Overtime)", options=["ไม่ทำ (No)", "ทำ (Yes)"])
@@ -313,7 +313,67 @@ elif selected_page == "🌳 Decision Tree":
             st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
 elif selected_page == "⚡ Support Vector Machine (SVM)":
-    render_model_page("Support Vector Machine (SVM)", "⚡", "Classification using SVM algorithm.", "#F59E0B")
+    render_model_page("Support Vector Machine (SVM)", "⚡", "ระบบคัดกรองความเสี่ยงโรคเบาหวานเบื้องต้น (Diabetes Prediction)", "#F59E0B")
+    
+    st.markdown("### 🩺 1. กรอกข้อมูลสุขภาพเบื้องต้น")
+    
+    # สร้างฟอร์มกรอกข้อมูลแบบ 2 คอลัมน์
+    col1, col2 = st.columns(2)
+    with col1:
+        glucose = st.number_input("ค่าน้ำตาลในเลือด (Glucose - mg/dL)", min_value=0, max_value=300, value=100)
+        st.markdown("<small style='color:gray;'>* ปกติ < 100, เสี่ยง 100-125, สูง > 125</small>", unsafe_allow_html=True)
+        
+        bmi = st.number_input("ดัชนีมวลกาย (BMI)", min_value=10.0, max_value=50.0, value=22.5, format="%.1f")
+    with col2:
+        age = st.number_input("อายุ (ปี)", min_value=1, max_value=120, value=35)
+        blood_pressure = st.number_input("ความดันโลหิต Diastolic (ตัวล่าง - mmHg)", min_value=20, max_value=150, value=80)
+        
+    st.markdown("---")
+    
+    # ปุ่มกดเพื่อทำนาย
+    if st.button("🚀 ประเมินความเสี่ยงสุขภาพ", use_container_width=True):
+        import pickle
+        try:
+            with st.spinner('กำลังใช้เทคโนโลยี SVM ประเมินผลสุขภาพ...'):
+                # 1. โหลดไฟล์โมเดล
+                with open('svm_diabetes_model.pkl', 'rb') as file:
+                    model = pickle.load(file)
+                
+                # 2. จัดเตรียมข้อมูล (เรียงให้ตรง: Glucose, BMI, Age, BloodPressure)
+                input_data = [[glucose, bmi, age, blood_pressure]]
+                
+                # 3. ทำนายผล
+                prediction = model.predict(input_data)
+                
+                # 4. แสดงผลลัพธ์
+                st.success("ประเมินผลสุขภาพเสร็จสิ้น!")
+                
+                st.markdown("### 📊 ผลการวินิจฉัยเบื้องต้น")
+                if prediction[0] == 1:
+                    st.markdown("""
+                    <div style='background-color: #fee2e2; padding: 20px; border-radius: 10px; border-left: 5px solid #EF4444; text-align: center;'>
+                        <h2 style='color: #b91c1c; margin: 0;'>🔴 มีความเสี่ยงเป็นโรคเบาหวาน (High Risk)</h2>
+                        <p style='color: #991b1b; margin-top: 10px; font-size: 1.1rem;'>
+                            จากข้อมูลสุขภาพของคุณ AI ตรวจพบรูปแบบที่ใกล้เคียงกับกลุ่มเสี่ยง <br>
+                            <i>ข้อแนะนำ: ควรปรึกษาแพทย์เพื่อตรวจเลือดอย่างละเอียด และปรับเปลี่ยนพฤติกรรมการทานอาหาร</i>
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.markdown("""
+                    <div style='background-color: #d1fae5; padding: 20px; border-radius: 10px; border-left: 5px solid #10B981; text-align: center;'>
+                        <h2 style='color: #047857; margin: 0;'>🟢 ความเสี่ยงต่ำ (Low Risk / Normal)</h2>
+                        <p style='color: #065f46; margin-top: 10px; font-size: 1.1rem;'>
+                            ข้อมูลสุขภาพของคุณอยู่ในเกณฑ์ปกติ ไม่มีแนวโน้มความเสี่ยงของโรคเบาหวาน <br>
+                            <i>ข้อแนะนำ: รักษาสุขภาพ ออกกำลังกายสม่ำเสมอ และตรวจสุขภาพประจำปี</i>
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+        except FileNotFoundError:
+            st.error("⚠️ ไม่พบไฟล์ 'svm_diabetes_model.pkl' กรุณาตรวจสอบให้แน่ใจว่าได้นำไฟล์มาใส่ในโฟลเดอร์เดียวกับโค้ดแล้ว")
+        except Exception as e:
+            st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
 elif selected_page == "🌀 K-Means Clustering":
     render_model_page("K-Means Clustering", "🌀", "Unsupervised clustering using K-Means.", "#8B5CF6")
