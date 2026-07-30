@@ -245,6 +245,7 @@ elif selected_page == "⚡ Support Vector Machine (SVM)":
     render_model_page("Support Vector Machine (SVM)", "⚡", "ระบบประเมินความเสี่ยงและตรวจจับการทุจริตบัตรเครดิต (Fraud Detection)", "#F59E0B")
     
     st.markdown("### 💳 1. ข้อมูลการทำธุรกรรมล่าสุด")
+    
     col1, col2 = st.columns(2)
     with col1:
         amount = st.number_input("ยอดเงินที่ทำรายการ (บาท)", min_value=0.0, value=1500.0, step=500.0)
@@ -254,33 +255,52 @@ elif selected_page == "⚡ Support Vector Machine (SVM)":
         failed_pin = st.number_input("จำนวนครั้งที่ใส่รหัส PIN ผิดก่อนหน้านี้", min_value=0, max_value=5, value=0)
         
     intl_txn = 1 if intl_txn_input == "ใช่ (International)" else 0
+        
     st.markdown("---")
     
     if st.button("🚀 ตรวจสอบความปลอดภัยของธุรกรรม", use_container_width=True):
+        import pickle
         try:
-            with st.spinner('กำลังใช้เทคโนโลยี SVM ตรวจสอบรูปแบบการทุจริต...'):
-                with open('Models/svm_fraud_model.pkl', 'rb') as file:
-                    model = pickle.load(file)
+            with st.spinner('กำลังใช้เทคโนโลยี SVM และระบบความปลอดภัยตรวจสอบ...'):
+                # 1. เช็คกฎเหล็กความปลอดภัยก่อน (Guardrail) ถ้าเข้าข่ายโกง บล็อกทันที!
+                # เงื่อนไข: ใส่รหัสผิดตั้งแต่ 3 ครั้งขึ้นไป หรือ (ยอดเกิน 30,000 และอยู่ต่างประเทศ)
+                is_fraud_rule = (failed_pin >= 3) or (amount > 30000 and intl_txn == 1) or (distance > 100)
                 
-                input_data = [[amount, distance, intl_txn, failed_pin]]
-                prediction = model.predict(input_data)
+                if is_fraud_rule:
+                    prediction_val = 1 # บังคับเป็นทุจริต
+                else:
+                    # ถ้าผ่านกฎเหล็ก ค่อยให้โมเดล SVM ตัดสินใจต่อ
+                    with open('Models/svm_fraud_model.pkl', 'rb') as file:
+                        model = pickle.load(file)
+                    input_data = [[amount, distance, intl_txn, failed_pin]]
+                    prediction_val = model.predict(input_data)[0]
                 
                 st.success("ตรวจสอบข้อมูลเสร็จสิ้น!")
+                
                 st.markdown("### 📊 สถานะการทำรายการ")
-                if prediction[0] == 1:
+                if prediction_val == 1:
                     st.markdown("""
                     <div style='background-color: #fee2e2; padding: 20px; border-radius: 10px; border-left: 5px solid #EF4444; text-align: center;'>
                         <h2 style='color: #b91c1c; margin: 0;'>🔴 ระงับการทำรายการ (Suspicious / Fraud)</h2>
-                        <p style='color: #991b1b; margin-top: 10px; font-size: 1.1rem;'>ระบบตรวจพบพฤติกรรมผิดปกติ บล็อกชั่วคราว</p>
+                        <p style='color: #991b1b; margin-top: 10px; font-size: 1.1rem;'>
+                            ระบบตรวจพบพฤติกรรมการใช้งานที่ผิดปกติ (ใส่รหัสผิดบ่อย / ยอดสูงผิดปกติในต่างประเทศ) <br>
+                            <i>ระบบได้ทำการบล็อกรายการนี้ชั่วคราวเพื่อความปลอดภัยของท่าน</i>
+                        </p>
                     </div>
                     """, unsafe_allow_html=True)
                 else:
                     st.markdown("""
                     <div style='background-color: #d1fae5; padding: 20px; border-radius: 10px; border-left: 5px solid #10B981; text-align: center;'>
                         <h2 style='color: #047857; margin: 0;'>🟢 อนุมัติการทำรายการ (Normal Transaction)</h2>
-                        <p style='color: #065f46; margin-top: 10px; font-size: 1.1rem;'>ทำรายการสำเร็จอย่างปลอดภัย</p>
+                        <p style='color: #065f46; margin-top: 10px; font-size: 1.1rem;'>
+                            รูปแบบการทำรายการปกติตามประวัติการใช้งาน ระบบได้ทำการตัดเงินเรียบร้อยแล้ว <br>
+                            <i>ทำรายการสำเร็จอย่างปลอดภัย</i>
+                        </p>
                     </div>
                     """, unsafe_allow_html=True)
+                
+        except FileNotFoundError:
+            st.error("⚠️ ไม่พบไฟล์ 'Models/svm_fraud_model.pkl' กรุณาตรวจสอบว่าได้สร้างโฟลเดอร์ Models และใส่ไฟล์ไว้แล้ว")
         except Exception as e:
             st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
