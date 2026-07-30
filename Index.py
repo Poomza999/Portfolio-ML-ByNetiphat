@@ -78,9 +78,9 @@ with st.sidebar:
     
     st.markdown(f"""
         <div style="background-color: #F8FAFC; padding: 15px; border-radius: 10px; border-left: 4px solid #0072FF; margin-bottom: 20px;">
-            <p style="margin: 0; font-size: 0.9rem;"><b>ชื่อ:</b> {developer_name}</p>
-            <p style="margin: 0; font-size: 0.9rem;"><b>รหัส:</b> {student_id}</p>
-            <span "color #000000"><p style="margin: 0; font-size: 0.9rem;"><b>หมู่เรียน:</b> {section}</p></span>
+            <p style="margin: 0; font-size: 0.9rem; color: #475569;"><b style="color: #1E293B;">ชื่อ:</b> {developer_name}</p>
+            <p style="margin: 0; font-size: 0.9rem; color: #475569;"><b style="color: #1E293B;">รหัส:</b> {student_id}</p>
+            <p style="margin: 0; font-size: 0.9rem; color: #475569;"><b style="color: #1E293B;">หมู่เรียน:</b> {section}</p>
         </div>
     """, unsafe_allow_html=True)
     
