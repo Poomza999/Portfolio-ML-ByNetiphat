@@ -1,7 +1,17 @@
 import streamlit as st
+import base64
+import os
 
 # ตั้งค่าหน้าเว็บให้แสดงผลแบบกว้าง
 st.set_page_config(page_title="ML Web Model Portfolio", layout="wide", initial_sidebar_state="expanded")
+
+# ==========================================
+# ฟังก์ชันสำหรับแปลงไฟล์รูปภาพเป็น Base64
+# ==========================================
+def get_base64_of_bin_file(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
 
 # ==========================================
 # จัดการ State สำหรับระบบนำทาง (Navigation)
@@ -68,11 +78,23 @@ pages = [
 ]
 
 with st.sidebar:
+    # จัดการรูปโปรไฟล์ด้วย Base64
+    image_path = "Image/dev.png" # แนะนำให้ใช้ Forward Slash (/) ใน Python
+    
+    try:
+        # ถ้าเจอไฟล์รูปภาพ ให้แปลงเป็น base64
+        img_base64 = get_base64_of_bin_file(image_path)
+        img_src = f"data:image/png;base64,{img_base64}"
+    except FileNotFoundError:
+        # ถ้าไม่เจอไฟล์รูปภาพ ให้ใช้รูป Default ไปก่อน
+        img_src = "https://cdn-icons-png.flaticon.com/512/4140/4140037.png"
+        st.error(f"⚠️ ไม่พบไฟล์รูปภาพที่: {image_path} ระบบจึงใช้รูปสำรอง")
+
     # โปรไฟล์
-    st.markdown("""
+    st.markdown(f"""
         <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://cdn-icons-png.flaticon.com/512/4140/4140037.png" width="90" style="border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 10px;">
-            <h3 style="margin: 0; font-size: 2rem; color: #00FF00;"><b style="color: #2CFF05;">ผู้พัฒนา</h3>
+            <img src="{img_src}" width="90" style="border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 10px;">
+            <h3 style="margin: 0; font-size: 2rem; color: #00FF00;"><b style="color: #2CFF05;">Developer</b></h3>
         </div>
     """, unsafe_allow_html=True)
     
