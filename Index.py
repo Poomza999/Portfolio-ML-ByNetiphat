@@ -520,7 +520,7 @@ elif selected_page == "🌲 Ensemble (Random Forest)":
         
         try:
             with st.spinner(f'กำลังดึงข้อมูลหุ้น {ticker_input} จากตลาดหลักทรัพย์...'):
-                # เปลี่ยน Path ไปที่ Models/
+                # โหลดโมเดลเวอร์ชั่นอัปเกรด
                 with open('Models/stock_model.pkl', 'rb') as file:
                     model = pickle.load(file)
                 
@@ -529,9 +529,22 @@ elif selected_page == "🌲 Ensemble (Random Forest)":
                 if ticker_data.empty:
                     st.error("❌ ไม่พบข้อมูลหุ้นนี้ กรุณาตรวจสอบสัญลักษณ์ให้ถูกต้อง")
                 else:
+                    # คำนวณอินดิเคเตอร์เดิม
                     ticker_data['SMA_10'] = ticker_data['Close'].rolling(window=10).mean()
                     ticker_data['SMA_30'] = ticker_data['Close'].rolling(window=30).mean()
                     ticker_data['Volume_Change'] = ticker_data['Volume'].pct_change()
+                    
+                    # คำนวณ RSI
+                    delta = ticker_data['Close'].diff()
+                    gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+                    loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+                    rs = gain / loss
+                    ticker_data['RSI'] = 100 - (100 / (1 + rs))
+                    
+                    # คำนวณ MACD
+                    ema_12 = ticker_data['Close'].ewm(span=12, adjust=False).mean()
+                    ema_26 = ticker_data['Close'].ewm(span=26, adjust=False).mean()
+                    ticker_data['MACD'] = ema_12 - ema_26
                     
                     latest_data = ticker_data.iloc[-1]
                     
@@ -545,8 +558,13 @@ elif selected_page == "🌲 Ensemble (Random Forest)":
                     latest_sma_10 = get_safe_float('SMA_10')
                     latest_sma_30 = get_safe_float('SMA_30')
                     latest_vol_change = get_safe_float('Volume_Change')
+                    latest_rsi = get_safe_float('RSI')
+                    latest_macd = get_safe_float('MACD')
                     
-                    input_features = [[latest_close, latest_sma_10, latest_sma_30, latest_vol_change]]
+                    input_features = [[
+                        latest_close, latest_sma_10, latest_sma_30, 
+                        latest_vol_change, latest_rsi, latest_macd
+                    ]]
                     
                     prediction = model.predict(input_features)
                     
@@ -554,8 +572,8 @@ elif selected_page == "🌲 Ensemble (Random Forest)":
                     
                     col1, col2, col3 = st.columns(3)
                     col1.metric("ราคาปิดล่าสุด", f"{latest_close:.2f}")
-                    col2.metric("SMA 10 วัน", f"{latest_sma_10:.2f}")
-                    col3.metric("SMA 30 วัน", f"{latest_sma_30:.2f}")
+                    col2.metric("RSI (ความร้อนแรง)", f"{latest_rsi:.2f}")
+                    col3.metric("MACD (แนวโน้ม)", f"{latest_macd:.2f}")
                     
                     st.markdown("<br>", unsafe_allow_html=True)
                     
