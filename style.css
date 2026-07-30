@@ -1,0 +1,48 @@
+/* ==========================================
+   🎨 ไฟล์ตกแต่ง UX/UI (style.css)
+   ========================================== */
+
+/* ปรับฟอนต์และพื้นหลังภาพรวม */
+.stApp {
+    background-color: #F8FAFC;
+}
+
+/* ตกแต่งปุ่มหลักของ Streamlit ให้มีความเงาและไล่เฉดสี */
+div.stButton > button {
+    background: linear-gradient(135deg, #00C6FF, #0072FF);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3);
+}
+
+div.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 114, 255, 0.5);
+    color: #ffffff;
+}
+
+/* ปุ่มรอง (ปุ่มย้อนกลับ) */
+.btn-secondary > div > button {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    box-shadow: none !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+.btn-secondary > div > button:hover {
+    background: #e2e8f0 !important;
+    color: #1e293b !important;
+}
+
+/* ตกแต่งการ์ดแสดงผลลัพธ์ตัวเลข (Metrics) ให้ดูเด่นขึ้น */
+div[data-testid="stMetric"] {
+    background-color: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    border: 1px solid #e2e8f0;
+}
