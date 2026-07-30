@@ -247,7 +247,7 @@ elif selected_page == "🌲 Ensemble (Random Forest)":
     
     st.markdown("---")
     
-    if st.button("🚀 ดึงข้อมูลล่าสุด & วิเคราะห์แนวโน้ม", use_container_width=True):
+if st.button("🚀 ดึงข้อมูลล่าสุด & วิเคราะห์แนวโน้ม", use_container_width=True):
         try:
             with st.spinner(f'กำลังดึงข้อมูลหุ้น {ticker_input} จากตลาดหลักทรัพย์...'):
                 # 1. โหลดสมอง AI
@@ -265,16 +265,22 @@ elif selected_page == "🌲 Ensemble (Random Forest)":
                     ticker_data['SMA_30'] = ticker_data['Close'].rolling(window=30).mean()
                     ticker_data['Volume_Change'] = ticker_data['Volume'].pct_change()
                     
-                    # 4. ดึงข้อมูลวันล่าสุด
+                    # 4. ดึงข้อมูลวันล่าสุด (ปรับแก้เพื่อรองรับ yfinance เวอร์ชั่นใหม่)
                     latest_data = ticker_data.iloc[-1]
-                    latest_close = float(latest_data['Close'].iloc[0]) if isinstance(latest_data['Close'], pd.Series) else float(latest_data['Close'])
                     
-                    input_features = [[
-                        float(latest_data['Close']), 
-                        float(latest_data['SMA_10']), 
-                        float(latest_data['SMA_30']), 
-                        float(latest_data['Volume_Change'])
-                    ]]
+                    # ฟังก์ชันช่วยดึงค่าตัวเลขออกมาให้ปลอดภัย 100%
+                    def get_safe_float(column_name):
+                        val = latest_data[column_name]
+                        if isinstance(val, pd.Series):
+                            return float(val.iloc[0])
+                        return float(val)
+
+                    latest_close = get_safe_float('Close')
+                    latest_sma_10 = get_safe_float('SMA_10')
+                    latest_sma_30 = get_safe_float('SMA_30')
+                    latest_vol_change = get_safe_float('Volume_Change')
+                    
+                    input_features = [[latest_close, latest_sma_10, latest_sma_30, latest_vol_change]]
                     
                     # 5. ทำนายผล
                     prediction = model.predict(input_features)
@@ -284,8 +290,8 @@ elif selected_page == "🌲 Ensemble (Random Forest)":
                     
                     col1, col2, col3 = st.columns(3)
                     col1.metric("ราคาปิดล่าสุด", f"{latest_close:.2f}")
-                    col2.metric("SMA 10 วัน", f"{float(latest_data['SMA_10']):.2f}")
-                    col3.metric("SMA 30 วัน", f"{float(latest_data['SMA_30']):.2f}")
+                    col2.metric("SMA 10 วัน", f"{latest_sma_10:.2f}")
+                    col3.metric("SMA 30 วัน", f"{latest_sma_30:.2f}")
                     
                     st.markdown("<br>", unsafe_allow_html=True)
                     
