@@ -109,7 +109,20 @@ def render_model_page(title, icon, description, color):
     st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
-    st.image("Image/Ai.png", caption="### ทดลองใช้งานโมเดล", use_container_width=True)
+    try:
+    icon_b64 = get_base64_of_bin_file("Image/Ai.png")
+    icon_src = f"data:image/png;base64,{icon_b64}"
+    except FileNotFoundError:
+    icon_src = "https://cdn-icons-png.flaticon.com/512/4140/4140037.png"
+
+# แสดงหัวข้อพร้อมไอคอนรูป AI ขนาดเล็กจัดเรียงในบรรทัดเดียวกัน
+st.markdown(f"""
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+        <img src="{icon_src}" width="36" style="border-radius: 8px;">
+        <h3 style="margin: 0; color: #FAFAFA; font-weight: 600;">ทดลองใช้งานโมเดล</h3>
+    </div>
+""", unsafe_allow_html=True)
+    st.markdown("### ทดลองใช้งานโมเดล")
 
 # ==========================================
 # การแสดงผลเนื้อหาหลัก (Main Content Routing)
