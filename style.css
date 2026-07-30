@@ -46,3 +46,8 @@ div[data-testid="stMetric"] {
     box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     border: 1px solid #e2e8f0;
 }
+/* จัดระเบียบข้อความใน st.radio (Sidebar) ให้แสดงผลเต็มบรรทัด ไม่ตกบรรทัดหรือโดนบัง */
+[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
+    white-space: nowrap;
+    font-size: 0.95rem;
+}
