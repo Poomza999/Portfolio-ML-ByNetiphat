@@ -1,6 +1,9 @@
 import streamlit as st
 import base64
 import os
+import pickle
+import yfinance as yf
+import pandas as pd
 
 # ตั้งค่าหน้าเว็บให้แสดงผลแบบกว้าง
 st.set_page_config(page_title="ML Web Model Portfolio", layout="wide", initial_sidebar_state="expanded")
@@ -137,7 +140,6 @@ def render_model_page(title, icon, description, color):
     
     st.markdown("---")
     st.markdown("### ⚙️ พื้นที่สำหรับใส่โค้ดโมเดล")
-    st.info(f"คุณสามารถนำโค้ดสำหรับโมเดล **{title}** (เช่น การอัปโหลดไฟล์ CSV, การปรับ Hyperparameters, และส่วนของการทำ Prediction) มาใส่ในส่วนนี้ได้เลยครับ")
 
 # ==========================================
 # การแสดงผลเนื้อหาหลัก (Main Content Routing)
@@ -206,7 +208,6 @@ elif selected_page == "🧮 K-Nearest Neighbor (KNN)":
     if st.button("🚀 ทำนายสายพันธุ์ (Predict)", use_container_width=True):
         try:
             # 1. โหลดไฟล์โมเดลที่เราเทรนไว้
-            import pickle
             with open('knn_model.pkl', 'rb') as file:
                 model = pickle.load(file)
             
@@ -247,9 +248,6 @@ elif selected_page == "🌲 Ensemble (Random Forest)":
     st.markdown("---")
     
     if st.button("🚀 ดึงข้อมูลล่าสุด & วิเคราะห์แนวโน้ม", use_container_width=True):
-        import pickle
-        import yfinance as yf
-        
         try:
             with st.spinner(f'กำลังดึงข้อมูลหุ้น {ticker_input} จากตลาดหลักทรัพย์...'):
                 # 1. โหลดสมอง AI
