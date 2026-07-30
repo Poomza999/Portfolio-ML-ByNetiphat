@@ -124,6 +124,9 @@ with st.sidebar:
 # ==========================================
 # ฟังก์ชันสร้างหน้าของแต่ละโมเดล (Template)
 # ==========================================
+# ==========================================
+# ฟังก์ชันสร้างหน้าของแต่ละโมเดล (Template)
+# ==========================================
 def render_model_page(title, icon, description, color):
     st.markdown(f"""
         <div style="background: linear-gradient(120deg, {color}, #0F172A); padding: 40px; border-radius: 15px; color: white; margin-bottom: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
@@ -132,9 +135,9 @@ def render_model_page(title, icon, description, color):
         </div>
     """, unsafe_allow_html=True)
     
-    # ปุ่มย้อนกลับไปหน้าหลัก
+    # ปุ่มย้อนกลับไปหน้าหลัก (แก้ Error ด้วย on_click ที่นี่ครับ!)
     st.markdown('<div class="btn-secondary">', unsafe_allow_html=True)
-    if st.button(..., on_click=change_page, args=("🏠 หน้าหลัก (Home)",))
+    st.button("⬅️ กลับหน้าหลัก", on_click=change_page, args=("🏠 หน้าหลัก (Home)",))
     st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
