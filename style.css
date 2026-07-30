@@ -51,3 +51,72 @@ div[data-testid="stMetric"] {
     white-space: nowrap;
     font-size: 0.95rem;
 }
+/* ==========================================
+   🖤 ไฟล์ตกแต่งสไตล์ Dark Mode (style.css)
+   ========================================== */
+
+/* 1. เปลี่ยนพื้นหลังหลักของแอปเป็นสีดำ/เทาเข้ม */
+.stApp {
+    background-color: #0E1117;
+    color: #FAFAFA;
+}
+
+/* 2. ปรับแต่งแถบ Sidebar ให้เป็นธีมดำเข้ม */
+[data-testid="stSidebar"] {
+    background-color: #161B22;
+}
+
+/* 3. จัดระเบียบตัวเลือกเมนูใน Sidebar ให้แสดงชื่อเต็มสวยๆ */
+[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label {
+    white-space: nowrap;
+    font-size: 0.95rem;
+    color: #E6EDF3 !important;
+}
+
+/* 4. ตกแต่งปุ่มหลักให้เรืองแสงและไล่เฉดสี */
+div.stButton > button {
+    background: linear-gradient(135deg, #00C6FF, #0072FF);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3);
+}
+
+div.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 114, 255, 0.5);
+    color: #ffffff;
+}
+
+/* 5. ปุ่มรอง (ปุ่มย้อนกลับ) ในธีมมืด */
+.btn-secondary > div > button {
+    background: #21262D !important;
+    color: #C9D1D9 !important;
+    box-shadow: none !important;
+    border: 1px solid #30363D !important;
+}
+
+.btn-secondary > div > button:hover {
+    background: #30363D !important;
+    color: #ffffff !important;
+}
+
+/* 6. ตกแต่งการ์ดแสดงผลตัวเลข (Metrics) ในโหมดมืด */
+div[data-testid="stMetric"] {
+    background-color: #161B22;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    border: 1px solid #30363D;
+}
+
+div[data-testid="stMetric"] label {
+    color: #8B949E !important;
+}
+
+div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
+    color: #F0F6FC !important;
+}
