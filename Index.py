@@ -455,7 +455,78 @@ elif selected_page == "🌀 K-Means Clustering":
             st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
 elif selected_page == "📈 Regression":
-    render_model_page("Regression", "📈", "Regression prediction model for continuous data.", "#EF4444")
+    render_model_page("Regression", "📈", "ระบบคาดการณ์ยอดขายรายเดือนและประเมินกำไรธุรกิจ (Revenue Forecasting)", "#EF4444")
+    
+    st.markdown("### 🏬 1. ระบุข้อมูลทำเลที่ตั้งสาขาใหม่")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        area = st.number_input("ขนาดพื้นที่ร้าน (ตารางเมตร)", min_value=10, max_value=500, value=80)
+        population = st.number_input("จำนวนประชากรในรัศมี 5 กม.", min_value=1000, max_value=500000, value=50000, step=5000)
+    with col2:
+        marketing = st.number_input("งบโฆษณา/ส่งเสริมการขาย (บาท/เดือน)", min_value=0, max_value=200000, value=15000, step=1000)
+        competitor_dist = st.number_input("ระยะห่างจากร้านคู่แข่ง (กิโลเมตร)", min_value=0.1, max_value=50.0, value=3.5, step=0.5)
+        
+    st.markdown("---")
+    
+    if st.button("🚀 ประเมินยอดขายและการลงทุน", use_container_width=True):
+        import pickle
+        import pandas as pd
+        try:
+            with st.spinner('กำลังคำนวณและสร้างโมเดลคาดการณ์ทางการเงิน...'):
+                # 1. โหลดไฟล์โมเดล
+                with open('regression_franchise_model.pkl', 'rb') as file:
+                    model = pickle.load(file)
+                
+                # 2. จัดเตรียมข้อมูล (Area, Population, Marketing, Competitor_Dist)
+                input_df = pd.DataFrame({
+                    'Area': [area],
+                    'Population': [population],
+                    'Marketing': [marketing],
+                    'Competitor_Dist': [competitor_dist]
+                })
+                
+                # 3. ทำนายผลยอดขาย (Revenue)
+                predicted_revenue = model.predict(input_df)[0]
+                
+                # จำลองโครงสร้างต้นทุน (Financial Assumption)
+                # สมมติให้ต้นทุนคงที่+ผันแปร ประมาณ 75% ของยอดขาย
+                estimated_cost = predicted_revenue * 0.75
+                net_profit = predicted_revenue - estimated_cost
+                margin_percent = (net_profit / predicted_revenue) * 100
+                
+                # 4. แสดงผลลัพธ์
+                st.success("การประเมินทางการเงินเสร็จสิ้น!")
+                
+                st.markdown("### 📊 รายงานคาดการณ์ทางการเงิน (ต่อเดือน)")
+                
+                # แสดงเป็นตัวเลข Dashboard สวยๆ
+                m_col1, m_col2, m_col3 = st.columns(3)
+                m_col1.metric("💰 คาดการณ์ยอดขายรวม", f"฿{predicted_revenue:,.2f}")
+                m_col2.metric("📉 ต้นทุนประเมิน (75%)", f"฿{estimated_cost:,.2f}")
+                
+                # ตกแต่งสีให้กำไร
+                if net_profit > 0:
+                    m_col3.metric("📈 กำไรสุทธิคาดการณ์", f"฿{net_profit:,.2f}", f"{margin_percent:.1f}% Margin")
+                    st.markdown(f"""
+                    <div style='background-color: #f0fdf4; padding: 20px; border-radius: 10px; border-left: 5px solid #22c55e;'>
+                        <h4 style='color: #166534; margin: 0;'>✅ สรุปความคุ้มค่าการลงทุน: น่าน่าลงทุน</h4>
+                        <p style='color: #15803d; margin-top: 5px;'>ทำเลนี้มีศักยภาพในการทำกำไร สามารถพิจารณาเดินหน้าแผนธุรกิจหรือเพิ่มงบการตลาดเพื่อดันยอดขายได้</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    m_col3.metric("⚠️ ขาดทุนสุทธิคาดการณ์", f"฿{net_profit:,.2f}", f"{margin_percent:.1f}% Margin", delta_color="inverse")
+                    st.markdown(f"""
+                    <div style='background-color: #fef2f2; padding: 20px; border-radius: 10px; border-left: 5px solid #ef4444;'>
+                        <h4 style='color: #991b1b; margin: 0;'>❌ สรุปความคุ้มค่าการลงทุน: มีความเสี่ยงสูง</h4>
+                        <p style='color: #b91c1c; margin-top: 5px;'>ทำเลนี้อาจสร้างรายได้ไม่ครอบคลุมต้นทุน แนะนำให้พิจารณาหาพื้นที่ใหม่ หรือปรับโครงสร้างขนาดร้านเพื่อลดต้นทุน</p>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+        except FileNotFoundError:
+            st.error("⚠️ ไม่พบไฟล์ 'regression_franchise_model.pkl' กรุณาตรวจสอบให้แน่ใจว่าได้นำไฟล์มาใส่ในโฟลเดอร์เดียวกับโค้ดแล้ว")
+        except Exception as e:
+            st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
 elif selected_page == "🌲 Ensemble (Random Forest)":
     render_model_page("Ensemble (Random Forest)", "🌲", "AI ทำนายทิศทางหุ้นแบบ Real-time ด้วย Random Forest", "#06B6D4")
