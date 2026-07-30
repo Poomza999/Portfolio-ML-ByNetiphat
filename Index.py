@@ -125,7 +125,7 @@ if selected_page == "🏠 หน้าหลัก (Home)":
     """
     st.markdown(banner_html, unsafe_allow_html=True)
 
-    st.markdown("### 🚀 Explore Applications")
+    st.markdown("### 🚀 Models ทั้งหมด")
     
     col1, col2, col3 = st.columns(3)
 
