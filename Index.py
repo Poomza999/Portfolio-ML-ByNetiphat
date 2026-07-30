@@ -313,65 +313,66 @@ elif selected_page == "🌳 Decision Tree":
             st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
 elif selected_page == "⚡ Support Vector Machine (SVM)":
-    render_model_page("Support Vector Machine (SVM)", "⚡", "ระบบคัดกรองความเสี่ยงโรคเบาหวานเบื้องต้น (Diabetes Prediction)", "#F59E0B")
+    render_model_page("Support Vector Machine (SVM)", "⚡", "ระบบประเมินความเสี่ยงและตรวจจับการทุจริตบัตรเครดิต (Fraud Detection)", "#F59E0B")
     
-    st.markdown("### 🩺 1. กรอกข้อมูลสุขภาพเบื้องต้น")
+    st.markdown("### 💳 1. ข้อมูลการทำธุรกรรมล่าสุด")
     
     # สร้างฟอร์มกรอกข้อมูลแบบ 2 คอลัมน์
     col1, col2 = st.columns(2)
     with col1:
-        glucose = st.number_input("ค่าน้ำตาลในเลือด (Glucose - mg/dL)", min_value=0, max_value=300, value=100)
-        st.markdown("<small style='color:gray;'>* ปกติ < 100, เสี่ยง 100-125, สูง > 125</small>", unsafe_allow_html=True)
-        
-        bmi = st.number_input("ดัชนีมวลกาย (BMI)", min_value=10.0, max_value=50.0, value=22.5, format="%.1f")
+        amount = st.number_input("ยอดเงินที่ทำรายการ (บาท)", min_value=0.0, value=1500.0, step=500.0)
+        distance = st.number_input("ระยะทางจากจุดใช้งานประจำ (กิโลเมตร)", min_value=0.0, value=5.0, step=1.0)
     with col2:
-        age = st.number_input("อายุ (ปี)", min_value=1, max_value=120, value=35)
-        blood_pressure = st.number_input("ความดันโลหิต Diastolic (ตัวล่าง - mmHg)", min_value=20, max_value=150, value=80)
+        intl_txn_input = st.selectbox("เป็นการทำรายการจากต่างประเทศหรือไม่?", options=["ไม่ใช่ (Domestic)", "ใช่ (International)"])
+        failed_pin = st.number_input("จำนวนครั้งที่ใส่รหัส PIN ผิดก่อนหน้านี้", min_value=0, max_value=5, value=0)
+        
+    # แปลงข้อความเป็นตัวเลขให้โมเดล
+    intl_txn = 1 if intl_txn_input == "ใช่ (International)" else 0
         
     st.markdown("---")
     
     # ปุ่มกดเพื่อทำนาย
-    if st.button("🚀 ประเมินความเสี่ยงสุขภาพ", use_container_width=True):
+    if st.button("🚀 ตรวจสอบความปลอดภัยของธุรกรรม", use_container_width=True):
         import pickle
         try:
-            with st.spinner('กำลังใช้เทคโนโลยี SVM ประเมินผลสุขภาพ...'):
+            with st.spinner('กำลังใช้เทคโนโลยี SVM ตรวจสอบรูปแบบการทุจริต...'):
                 # 1. โหลดไฟล์โมเดล
-                with open('svm_diabetes_model.pkl', 'rb') as file:
+                with open('svm_fraud_model.pkl', 'rb') as file:
                     model = pickle.load(file)
                 
-                # 2. จัดเตรียมข้อมูล (เรียงให้ตรง: Glucose, BMI, Age, BloodPressure)
-                input_data = [[glucose, bmi, age, blood_pressure]]
+                # 2. จัดเตรียมข้อมูล (เรียงให้ตรง: Amount, Distance, International, Failed_PIN)
+                input_data = [[amount, distance, intl_txn, failed_pin]]
                 
                 # 3. ทำนายผล
                 prediction = model.predict(input_data)
                 
                 # 4. แสดงผลลัพธ์
-                st.success("ประเมินผลสุขภาพเสร็จสิ้น!")
+                st.success("ตรวจสอบข้อมูลเสร็จสิ้น!")
                 
-                st.markdown("### 📊 ผลการวินิจฉัยเบื้องต้น")
+                st.markdown("### 📊 สถานะการทำรายการ")
                 if prediction[0] == 1:
                     st.markdown("""
                     <div style='background-color: #fee2e2; padding: 20px; border-radius: 10px; border-left: 5px solid #EF4444; text-align: center;'>
-                        <h2 style='color: #b91c1c; margin: 0;'>🔴 มีความเสี่ยงเป็นโรคเบาหวาน (High Risk)</h2>
+                        <h2 style='color: #b91c1c; margin: 0;'>🔴 ระงับการทำรายการ (Suspicious / Fraud)</h2>
                         <p style='color: #991b1b; margin-top: 10px; font-size: 1.1rem;'>
-                            จากข้อมูลสุขภาพของคุณ AI ตรวจพบรูปแบบที่ใกล้เคียงกับกลุ่มเสี่ยง <br>
-                            <i>ข้อแนะนำ: ควรปรึกษาแพทย์เพื่อตรวจเลือดอย่างละเอียด และปรับเปลี่ยนพฤติกรรมการทานอาหาร</i>
+                            ระบบตรวจพบพฤติกรรมการใช้งานที่ผิดปกติและมีความเสี่ยงสูงว่าอาจถูกมิจฉาชีพขโมยบัตร <br>
+                            <i>ระบบได้ทำการบล็อกรายการนี้ชั่วคราว กรุณาติดต่อ Call Center เพื่อยืนยันตัวตน</i>
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
                 else:
                     st.markdown("""
                     <div style='background-color: #d1fae5; padding: 20px; border-radius: 10px; border-left: 5px solid #10B981; text-align: center;'>
-                        <h2 style='color: #047857; margin: 0;'>🟢 ความเสี่ยงต่ำ (Low Risk / Normal)</h2>
+                        <h2 style='color: #047857; margin: 0;'>🟢 อนุมัติการทำรายการ (Normal Transaction)</h2>
                         <p style='color: #065f46; margin-top: 10px; font-size: 1.1rem;'>
-                            ข้อมูลสุขภาพของคุณอยู่ในเกณฑ์ปกติ ไม่มีแนวโน้มความเสี่ยงของโรคเบาหวาน <br>
-                            <i>ข้อแนะนำ: รักษาสุขภาพ ออกกำลังกายสม่ำเสมอ และตรวจสุขภาพประจำปี</i>
+                            รูปแบบการทำรายการปกติตามประวัติการใช้งานของลูกค้า ระบบได้ทำการตัดเงินเรียบร้อยแล้ว <br>
+                            <i>ทำรายการสำเร็จอย่างปลอดภัย</i>
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
                 
         except FileNotFoundError:
-            st.error("⚠️ ไม่พบไฟล์ 'svm_diabetes_model.pkl' กรุณาตรวจสอบให้แน่ใจว่าได้นำไฟล์มาใส่ในโฟลเดอร์เดียวกับโค้ดแล้ว")
+            st.error("⚠️ ไม่พบไฟล์ 'svm_fraud_model.pkl' กรุณาตรวจสอบให้แน่ใจว่าได้นำไฟล์มาใส่ในโฟลเดอร์เดียวกับโค้ดแล้ว")
         except Exception as e:
             st.error(f"❌ เกิดข้อผิดพลาด: {e}")
 
