@@ -118,48 +118,42 @@ def render_model_page(title, icon, description, color):
 if selected_page == "🏠 หน้าหลัก (Home)":
     # Hero Banner
     banner_html = f"""
-    <div style="background: linear-gradient(120deg, #1E293B, #0F172A); padding: 40px 30px; border-radius: 20px; color: white; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+    <div style="background: linear-gradient(120deg, #1E293B, #0F172A); padding: 40px 30px; border-radius: 20px; color: white; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
         <p style="color: #38BDF8; font-weight: bold; letter-spacing: 1.5px; margin-bottom: 5px;">MACHINE LEARNING PORTFOLIO</p>
-        <h1 style="color: white; margin-top: 0; margin-bottom: 10px; font-size: 2.2rem;">รวมผลงานแอปพลิเคชัน 6 โมเดล</h1>
-        <p style="color: #94A3B8; font-size: 1rem; margin: 0;">ระบบสารสนเทศเพื่อการประเมินและวิเคราะห์ข้อมูลด้วยปัญญาประดิษฐ์</p>
+        <h1 style="color: white; margin-top: 0; margin-bottom: 15px; font-size: 2.2rem;">รวมผลงานแอปพลิเคชัน 6 โมเดล</h1>
     </div>
     """
     st.markdown(banner_html, unsafe_allow_html=True)
 
-    # แบ่งหน้าจอเป็น 2 คอลัมน์ (ซ้าย: เมนูลัดเลือกโมเดล, ขวา: รายชื่อโมเดลและรายละเอียดหัวข้อย่อย)
-    col_left, col_right = st.columns([1, 1.2])
+    st.markdown("### 🚀 Explore Applications")
+    
+    col1, col2, col3 = st.columns(3)
 
-    with col_left:
-        st.markdown("### 🎯 แผงควบคุมระบบ (Quick Navigation)")
-        st.markdown("เลือกโมเดลที่ต้องการเข้าใช้งานผ่านปุ่มด้านล่างนี้ได้ทันที:")
-        
-        # เปลี่ยนจากการ์ดเป็นการกดเลือกผ่านปุ่มลัดด้านซ้าย
-        st.button("🧮 K-Nearest Neighbor (KNN)", use_container_width=True, on_click=change_page, args=("🧮 K-Nearest Neighbor (KNN)",))
-        st.button("🌳 Decision Tree", use_container_width=True, on_click=change_page, args=("🌳 Decision Tree",))
-        st.button("⚡ Support Vector Machine (SVM)", use_container_width=True, on_click=change_page, args=("⚡ Support Vector Machine (SVM)",))
-        st.button("🌀 K-Means Clustering", use_container_width=True, on_click=change_page, args=("🌀 K-Means Clustering",))
-        st.button("📈 Regression", use_container_width=True, on_click=change_page, args=("📈 Regression",))
-        st.button("🌲 Ensemble (Random Forest)", use_container_width=True, on_click=change_page, args=("🌲 Ensemble (Random Forest)",))
+    def create_card(col, icon, title, description, accent_color, page_target):
+        with col:
+            html_card = f"""
+            <div style="background-color: white; border-radius: 15px; padding: 25px; 
+                        box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 5px solid {accent_color}; 
+                        margin-bottom: 15px; height: 160px;">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                    <div style="background-color: {accent_color}20; padding: 10px; border-radius: 12px; font-size: 1.5rem;">{icon}</div>
+                    <h4 style="margin: 0; color: #1E293B; font-size: 1.1rem;">{title}</h4>
+                </div>
+                <p style="color: #64748B; font-size: 0.9rem; margin: 0;">{description}</p>
+            </div>
+            """
+            st.markdown(html_card, unsafe_allow_html=True)
+            st.button(f"เปิดใช้งานโมเดล", key=f"btn_{title}", use_container_width=True, on_click=change_page, args=(page_target,))
+            st.markdown("<div style='margin-bottom: 30px;'></div>", unsafe_allow_html=True)
 
-    with col_right:
-        st.markdown("### 📚 รายชื่อโมเดลและหัวข้อย่อย")
-        st.markdown("""
-        <div style="background-color: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #0072FF;">
-            <ul style="margin: 0; padding-left: 20px; color: #334155; line-height: 1.8;">
-                <li><b>🧮 K-Nearest Neighbor (KNN)</b><br><small style="color: #64748B;">└ ระบบประเมินความเสี่ยงและอนุมัติสินเชื่อ (Loan Approval)</small></li>
-                <hr style="margin: 8px 0; border-color: #f1f5f9;">
-                <li><b>🌳 Decision Tree</b><br><small style="color: #64748B;">└ ระบบวิเคราะห์ความเสี่ยงพนักงานลาออก (HR Analytics)</small></li>
-                <hr style="margin: 8px 0; border-color: #f1f5f9;">
-                <li><b>⚡ Support Vector Machine (SVM)</b><br><small style="color: #64748B;">└ ระบบตรวจจับการทุจริตบัตรเครดิต (Fraud Detection)</small></li>
-                <hr style="margin: 8px 0; border-color: #f1f5f9;">
-                <li><b>🌀 K-Means Clustering</b><br><small style="color: #64748B;">└ ระบบจัดกลุ่มลูกค้าบัตรเครดิต (Customer Segmentation)</small></li>
-                <hr style="margin: 8px 0; border-color: #f1f5f9;">
-                <li><b>📈 Regression</b><br><small style="color: #64748B;">└ ระบบคาดการณ์ยอดขายและประเมินกำไรธุรกิจ</small></li>
-                <hr style="margin: 8px 0; border-color: #f1f5f9;">
-                <li><b>🌲 Ensemble (Random Forest)</b><br><small style="color: #64748B;">└ ระบบทำนายทิศทางหุ้นแบบ Real-time (RSI & MACD)</small></li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
+    # แสดงการ์ด 6 โมเดล
+    create_card(col1, "🧮", "K-Nearest Neighbor", "ระบบประเมินความเสี่ยงและอนุมัติสินเชื่อ (Loan Approval)", "#3B82F6", "🧮 K-Nearest Neighbor (KNN)")
+    create_card(col2, "🌳", "Decision Tree", "ระบบวิเคราะห์ความเสี่ยงพนักงานลาออก (HR Analytics)", "#10B981", "🌳 Decision Tree")
+    create_card(col3, "⚡", "Support Vector Machine", "ระบบตรวจจับการทุจริตบัตรเครดิต (Fraud Detection)", "#F59E0B", "⚡ Support Vector Machine (SVM)")
+
+    create_card(col1, "🌀", "K-Means Clustering", "ระบบจัดกลุ่มลูกค้าบัตรเครดิต (Customer Segmentation)", "#8B5CF6", "🌀 K-Means Clustering")
+    create_card(col2, "📈", "Regression", "ระบบคาดการณ์ยอดขายรายเดือนและประเมินกำไรธุรกิจ", "#EF4444", "📈 Regression")
+    create_card(col3, "🌲", "Random Forest", "ระบบทำนายทิศทางหุ้นแบบ Real-time ด้วย Random Forest", "#06B6D4", "🌲 Ensemble (Random Forest)")
 
 elif selected_page == "🧮 K-Nearest Neighbor (KNN)":
     render_model_page("K-Nearest Neighbor (KNN)", "🧮", "ระบบประเมินความเสี่ยงและอนุมัติสินเชื่อ (Loan Approval) ด้วย KNN", "#3B82F6")
